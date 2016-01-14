@@ -8,7 +8,6 @@ import (
 	"github.com/aws/aws-sdk-go/aws/session"
 	"github.com/aws/aws-sdk-go/service/dynamodb"
 	"github.com/aws/aws-sdk-go/service/dynamodbstreams"
-	"strconv"
 	"github.com/urakozz/go-dynamodb-stream-subscriber/stream"
 )
 func main(){
