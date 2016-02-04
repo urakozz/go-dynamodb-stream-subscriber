@@ -17,7 +17,7 @@ func main(){
   dynamoSvc := dynamodb.New(sess, cfg)
   table := "tableName"
   
-  streamSubscriber := stream.NewStreamSubscriber(persist.GetDynamo(), streamSvc, table)
+  streamSubscriber := stream.NewStreamSubscriber(dynamoSvc, streamSvc, table)
   ch , errCh :=  streamProvider.GetStreamData()
   
   go func(ch <- chan *dynamodbstreams.Record){
