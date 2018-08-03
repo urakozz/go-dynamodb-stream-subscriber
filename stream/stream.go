@@ -1,4 +1,3 @@
-
 // Yury Kozyrev (urakozz)
 // MIT License
 package stream
@@ -23,9 +22,9 @@ type StreamSubscriber struct {
 }
 
 func NewStreamSubscriber(
-dynamoSvc *dynamodb.DynamoDB,
-streamSvc *dynamodbstreams.DynamoDBStreams,
-table string) *StreamSubscriber {
+	dynamoSvc *dynamodb.DynamoDB,
+	streamSvc *dynamodbstreams.DynamoDBStreams,
+	table string) *StreamSubscriber {
 	s := &StreamSubscriber{dynamoSvc: dynamoSvc, streamSvc: streamSvc, table: &table}
 	s.applyDefaults()
 	return s
@@ -50,7 +49,7 @@ func (r *StreamSubscriber) GetStreamData() (<-chan *dynamodbstreams.Record, <-ch
 	ch := make(chan *dynamodbstreams.Record, 1)
 	errCh := make(chan error, 1)
 
-	go func(ch chan <- *dynamodbstreams.Record, errCh chan <- error) {
+	go func(ch chan<- *dynamodbstreams.Record, errCh chan<- error) {
 		var shardId *string
 		var prevShardId *string
 		var streamArn *string
@@ -89,7 +88,7 @@ func (r *StreamSubscriber) GetStreamDataAsync() (<-chan *dynamodbstreams.Record,
 	needUpdateChannel <- struct{}{}
 
 	allShards := make(map[string]struct{})
-	shardProcessingLimit := 5;
+	shardProcessingLimit := 5
 	shardsCh := make(chan *dynamodbstreams.GetShardIteratorInput, shardProcessingLimit)
 	lock := sync.Mutex{}
 
@@ -112,7 +111,7 @@ func (r *StreamSubscriber) GetStreamDataAsync() (<-chan *dynamodbstreams.Record,
 					errCh <- err
 					return
 				}
-				ids, err := r.getShardIds(streamArn);
+				ids, err := r.getShardIds(streamArn)
 				if err != nil {
 					errCh <- err
 					return
@@ -137,17 +136,17 @@ func (r *StreamSubscriber) GetStreamDataAsync() (<-chan *dynamodbstreams.Record,
 
 	limit := make(chan struct{}, shardProcessingLimit)
 
-	go func(){
+	go func() {
 		time.Sleep(time.Second * 10)
 		for shardInput := range shardsCh {
 			limit <- struct{}{}
-			go func(sInput *dynamodbstreams.GetShardIteratorInput){
+			go func(sInput *dynamodbstreams.GetShardIteratorInput) {
 				err := r.processShard(sInput, ch)
 				if err != nil {
 					errCh <- err
 				}
 				// TODO: think about cleaning list of shards: delete(allShards, *sInput.ShardId)
-				<- limit
+				<-limit
 			}(shardInput)
 		}
 	}()
@@ -211,15 +210,15 @@ func (r *StreamSubscriber) getLatestStreamArn() (*string, error) {
 	return tableInfo.Table.LatestStreamArn, nil
 }
 
-func (r *StreamSubscriber) processShardBackport(shardId, lastStreamArn *string, ch chan <- *dynamodbstreams.Record) error {
+func (r *StreamSubscriber) processShardBackport(shardId, lastStreamArn *string, ch chan<- *dynamodbstreams.Record) error {
 	return r.processShard(&dynamodbstreams.GetShardIteratorInput{
 		StreamArn:         lastStreamArn,
 		ShardId:           shardId,
 		ShardIteratorType: r.ShardIteratorType,
-	}, ch);
+	}, ch)
 }
 
-func (r *StreamSubscriber) processShard(input *dynamodbstreams.GetShardIteratorInput, ch chan <- *dynamodbstreams.Record) error {
+func (r *StreamSubscriber) processShard(input *dynamodbstreams.GetShardIteratorInput, ch chan<- *dynamodbstreams.Record) error {
 	iter, err := r.streamSvc.GetShardIterator(input)
 	if err != nil {
 		return err
@@ -264,4 +263,3 @@ func (r *StreamSubscriber) processShard(input *dynamodbstreams.GetShardIteratorI
 	}
 	return nil
 }
-
