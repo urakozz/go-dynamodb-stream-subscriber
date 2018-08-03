@@ -7,7 +7,6 @@ import (
 	"errors"
 	"time"
 
-	"github.com/Home24/Category-Service/src/interfaces"
 	"github.com/aws/aws-sdk-go/aws"
 	"github.com/aws/aws-sdk-go/aws/awserr"
 	"github.com/aws/aws-sdk-go/service/dynamodb"
