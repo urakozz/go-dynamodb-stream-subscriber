@@ -189,7 +189,7 @@ func (r *StreamSubscriber) findProperShardId(previousShardId *string) (shadrId *
 		return
 	}
 
-	for i, shard := range des.StreamDescription.Shards {
+	for _, shard := range des.StreamDescription.Shards {
 		shadrId = shard.ShardId
 		if shard.ParentShardId != nil && *shard.ParentShardId == *previousShardId {
 			return
