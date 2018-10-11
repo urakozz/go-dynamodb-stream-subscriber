@@ -6,24 +6,27 @@ import (
 	"errors"
 	"time"
 
+	"sync"
+
 	"github.com/aws/aws-sdk-go/aws"
 	"github.com/aws/aws-sdk-go/aws/awserr"
 	"github.com/aws/aws-sdk-go/service/dynamodb"
+	"github.com/aws/aws-sdk-go/service/dynamodb/dynamodbiface"
 	"github.com/aws/aws-sdk-go/service/dynamodbstreams"
-	"sync"
+	"github.com/aws/aws-sdk-go/service/dynamodbstreams/dynamodbstreamsiface"
 )
 
 type StreamSubscriber struct {
-	dynamoSvc         *dynamodb.DynamoDB
-	streamSvc         *dynamodbstreams.DynamoDBStreams
+	dynamoSvc         dynamodbiface.DynamoDBAPI
+	streamSvc         dynamodbstreamsiface.DynamoDBStreamsAPI
 	table             *string
 	ShardIteratorType *string
 	Limit             *int64
 }
 
 func NewStreamSubscriber(
-	dynamoSvc *dynamodb.DynamoDB,
-	streamSvc *dynamodbstreams.DynamoDBStreams,
+	dynamoSvc dynamodbiface.DynamoDBAPI,
+	streamSvc dynamodbstreamsiface.DynamoDBStreamsAPI,
 	table string) *StreamSubscriber {
 	s := &StreamSubscriber{dynamoSvc: dynamoSvc, streamSvc: streamSvc, table: &table}
 	s.applyDefaults()
