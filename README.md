@@ -18,7 +18,7 @@ func main(){
   table := "tableName"
   
   streamSubscriber := stream.NewStreamSubscriber(dynamoSvc, streamSvc, table)
-  ch , errCh :=  streamProvider.GetStreamDataAsync()
+  ch, errCh :=  streamSubscriber.GetStreamDataAsync()
   
   go func(ch <- chan *dynamodbstreams.Record){
   	for record := range ch {
